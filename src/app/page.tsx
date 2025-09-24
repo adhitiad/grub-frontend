@@ -22,10 +22,19 @@ export default function HomePage() {
     // Check API health status
     const checkHealth = async () => {
       try {
+        console.log("Starting health check...");
         const health = await healthApi.check();
-        setHealthStatus(health);
+        console.log("Health check successful:", health);
+        setHealthStatus(health as any);
       } catch (error) {
         console.error("Health check failed:", error);
+        // Set a fallback health status to show the error in UI
+        setHealthStatus({
+          status: "error",
+          timestamp: new Date().toISOString(),
+          uptime: 0,
+          version: "unknown",
+        });
       }
     };
 
@@ -368,7 +377,9 @@ export default function HomePage() {
                   className={`w-3 h-3 rounded-full mr-2 ${
                     healthStatus.status === "healthy"
                       ? "bg-green-500"
-                      : "bg-red-500"
+                      : healthStatus.status === "error"
+                      ? "bg-red-500"
+                      : "bg-yellow-500"
                   }`}
                 ></div>
                 <span className="text-sm text-gray-700">
@@ -376,7 +387,11 @@ export default function HomePage() {
                 </span>
               </div>
               <div className="text-sm text-gray-500">
-                All systems operational
+                {healthStatus.status === "healthy"
+                  ? "All systems operational"
+                  : healthStatus.status === "error"
+                  ? "API connection failed"
+                  : "System status unknown"}
               </div>
             </div>
           </div>

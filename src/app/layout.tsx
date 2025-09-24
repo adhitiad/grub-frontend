@@ -1,8 +1,9 @@
 // Root Layout for Grub Frontend
+import { Navigation } from "@/components/layout/Navigation";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ToastProvider } from "@/components/providers/ToastProvider";
 import { AuthProvider } from "@/lib/auth";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -13,13 +14,21 @@ export const metadata: Metadata = {
   description: "Modern food distribution management system",
   keywords: ["food", "distribution", "management", "orders", "inventory"],
   authors: [{ name: "Grub Team" }],
-  viewport: "width=device-width, initial-scale=1",
-  themeColor: "#2563eb",
-  manifest: "/manifest.json",
+
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
+};
+
+export const viewport: Viewport = {
+  width: 1280,
+  height: 720,
+  themeColor: "#2563eb",
+  initialScale: 1.0,
+  maximumScale: 1.0,
+  minimumScale: 1.0,
+  colorScheme: "light",
 };
 
 export default function RootLayout({
@@ -34,6 +43,7 @@ export default function RootLayout({
           <AuthProvider>
             <ToastProvider>
               <div id="root" className="h-full">
+                <Navigation />
                 {children}
               </div>
             </ToastProvider>
