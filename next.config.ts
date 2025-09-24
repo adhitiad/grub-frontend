@@ -25,16 +25,8 @@ const nextConfig: NextConfig = {
     formats: ["image/webp", "image/avif"],
   },
 
-  // Note: Headers don't work with static export, handled by Netlify headers
-
-  // Note: Redirects don't work with static export, handled by Netlify redirects
-
-  // Note: Rewrites don't work with static export, handled by Netlify redirects
-
-  // Output configuration for Netlify
-  output: "export",
+  // Enable API routes and server-side features for Vercel
   trailingSlash: true,
-  outputFileTracingRoot: __dirname,
 
   // Disable x-powered-by header
   poweredByHeader: false,
