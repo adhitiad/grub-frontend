@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   // Environment variables
   env: {
     CUSTOM_KEY: "grub-frontend",
+    NEXT_PUBLIC_API_URL: "https://grub-six.vercel.app",
   },
 
   // Image optimization
