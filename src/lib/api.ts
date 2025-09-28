@@ -152,7 +152,6 @@ export const apiRequest = async <T = unknown>(config: any): Promise<T> => {
       const apiError: ApiError = {
         message: error.response.data.message || error.message,
         code: error.response.data.code,
-        correlationId: error.response.data.correlationId,
         timestamp: new Date().toISOString(),
       };
       throw apiError;
