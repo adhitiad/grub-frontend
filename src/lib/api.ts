@@ -5,7 +5,8 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8520";
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "123456";
+const API_KEY =
+  process.env.NEXT_PUBLIC_API_KEY || "asdfghjklqweertyuiopzxcvbnmasdfgtre";
 const API_TIMEOUT = 30000; // 30 seconds
 
 // Device ID management
@@ -123,18 +124,7 @@ export const apiRequest = async <T = unknown>(config: any): Promise<T> => {
 
     return response.data.data as T;
   } catch (error: any) {
-    console.error("API request error:", {
-      message: error.message,
-      code: error.code,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      config: {
-        url: error.config?.url,
-        method: error.config?.method,
-        baseURL: error.config?.baseURL,
-      },
-    });
+    console.error("API request error:", error);
 
     // Handle 503 Service Unavailable (backend is unhealthy but responding)
     if (error.response?.status === 503) {
@@ -190,7 +180,7 @@ export const authApi = {
     return apiRequest({
       method: "POST",
       url: "/api/auth/login",
-      data: { email, password, deviceId: getDeviceId() },
+      data: { email, password },
     });
   },
 
