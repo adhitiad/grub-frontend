@@ -5,6 +5,7 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8520";
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "123456";
 const API_TIMEOUT = 30000; // 30 seconds
 
 // Device ID management
@@ -56,7 +57,7 @@ const createApiClient = (): AxiosInstance => {
 
       // Add auth token if available
       if (typeof window !== "undefined") {
-        const token = localStorage.getItem("grub_auth_token");
+        const token = API_KEY;
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
