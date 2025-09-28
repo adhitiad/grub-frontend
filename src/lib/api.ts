@@ -111,18 +111,49 @@ const createApiClient = (): AxiosInstance => {
 // API client instance
 export const apiClient = createApiClient();
 
-// Generic API request wrapper
+// Generic API request wrapper with improved response handling
 export const apiRequest = async <T = unknown>(config: any): Promise<T> => {
   try {
     console.log("Making API request:", config.method, config.url);
-    const response = await apiClient.request<ApiResponse<T>>(config);
+    const response = await apiClient.request(config);
     console.log("API response received:", response.status, response.data);
 
-    if (!response.data.success) {
-      throw new Error(response.data.message || "API request failed");
+    // Handle different response structures
+    const responseData = response.data;
+
+    // Check if response has the expected ApiResponse structure
+    if (
+      responseData &&
+      typeof responseData === "object" &&
+      "success" in responseData
+    ) {
+      const apiResponse = responseData as ApiResponse<T>;
+
+      if (!apiResponse.success) {
+        const apiError: ApiError = {
+          message: apiResponse.message || "API request failed",
+          code: apiResponse.error,
+          timestamp: new Date().toISOString(),
+        };
+        throw apiError;
+      }
+
+      // Handle successful response with data
+      if (apiResponse.data !== undefined) {
+        return apiResponse.data as T;
+      }
+
+      // Handle successful response without data (e.g., DELETE operations)
+      return true as T;
     }
 
-    return response.data.data as T;
+    // Handle direct data responses (not wrapped in ApiResponse structure)
+    if (responseData !== null && responseData !== undefined) {
+      return responseData as T;
+    }
+
+    // Handle empty responses
+    return true as T;
   } catch (error: any) {
     console.error("API request error:", error);
 
@@ -131,17 +162,54 @@ export const apiRequest = async <T = unknown>(config: any): Promise<T> => {
       console.warn(
         "Backend service is unhealthy but responding. Continuing with degraded functionality."
       );
-      // For health checks, we can still return the data even if status is 503
-      if (error.response?.data?.success && error.response?.data?.data) {
-        return error.response.data.data as T;
+
+      const responseData = error.response?.data;
+
+      // Try to extract data from 503 responses if available
+      if (responseData) {
+        // Check if it's a wrapped response
+        if (responseData.success && responseData.data !== undefined) {
+          return responseData.data as T;
+        }
+        // Return direct data if available
+        if (responseData !== null && responseData !== undefined) {
+          return responseData as T;
+        }
       }
+
+      // If no data available in 503 response, throw generic error
+      throw new Error("Service temporarily unavailable");
     }
 
-    // Handle axios errors with response
+    // Handle malformed responses with better error extraction
     if (error.response?.data) {
+      const responseData = error.response.data;
+
+      // Handle different error response structures
+      let errorMessage = "API request failed";
+      let errorCode: string | undefined;
+
+      if (typeof responseData === "string") {
+        errorMessage = responseData;
+      } else if (typeof responseData === "object") {
+        // Try to extract error message from various possible fields
+        errorMessage =
+          responseData.message ||
+          responseData.error ||
+          responseData.errorMessage ||
+          responseData.msg ||
+          error.message ||
+          errorMessage;
+
+        errorCode =
+          responseData.code ||
+          responseData.errorCode ||
+          responseData.statusCode;
+      }
+
       const apiError: ApiError = {
-        message: error.response.data.message || error.message,
-        code: error.response.data.code,
+        message: errorMessage,
+        code: errorCode,
         timestamp: new Date().toISOString(),
       };
       throw apiError;
@@ -170,7 +238,17 @@ export const apiRequest = async <T = unknown>(config: any): Promise<T> => {
       throw new Error(`Request timeout: API server took too long to respond.`);
     }
 
-    throw error;
+    // Handle cases where error is already an ApiError
+    if (error.message && error.timestamp) {
+      throw error;
+    }
+
+    // Fallback for unknown errors
+    const apiError: ApiError = {
+      message: error.message || "An unexpected error occurred",
+      timestamp: new Date().toISOString(),
+    };
+    throw apiError;
   }
 };
 
