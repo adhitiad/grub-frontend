@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Utility functions for the Grub frontend
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";

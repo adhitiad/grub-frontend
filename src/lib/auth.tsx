@@ -37,7 +37,7 @@ interface RegisterData {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Auth storage utilities
-const AUTH_TOKEN_KEY = "grub_auth_token";
+const AUTH_TOKEN_KEY = "123456";
 const USER_DATA_KEY = "grub_user";
 
 const getStoredToken = (): string | null => {

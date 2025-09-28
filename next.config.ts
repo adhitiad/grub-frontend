@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
 
   // Environment variables
   env: {
-    CUSTOM_KEY: "grub-frontend",
+    CUSTOM_KEY: "123456",
     NEXT_PUBLIC_API_URL: "https://grub-six.vercel.app",
   },
 
